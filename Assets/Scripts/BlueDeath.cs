@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Balrog : Enemy
+public class BlueDeath : Enemy
 {
     protected override void Start()
     {
         base.Start();
-        damage = 10;
+        damage = 0;
         attackRanged = 1.5f;
-        attackDelay = 2f;
-        moveSpeed = 85f;
+        attackDelay = 5f;
+        moveSpeed = 60f;
 
         maxHealthPoint = 100;
         HealthPoint = maxHealthPoint;
@@ -33,6 +33,10 @@ public class Balrog : Enemy
 
     public override int Health(int amount)
     {
+        if(amount < 0)
+        {
+            animator.SetTrigger("takeDmg");
+        }
         return base.Health(amount);
     }
 
@@ -48,7 +52,16 @@ public class Balrog : Enemy
 
     protected override void Attack()
     {
-        base.Attack();
+        animator.SetTrigger("attack");
+        StartCoroutine(WaitForAnimation());
+        
+        
+    }
+
+    private IEnumerator WaitForAnimation()
+    {
+        yield return new WaitForSeconds(0.25f);
+        fish.gameObject.SetActive(false);
     }
 
     protected override void Boundary()
@@ -60,6 +73,4 @@ public class Balrog : Enemy
     {
         base.Die();
     }
-
-
 }

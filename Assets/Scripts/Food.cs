@@ -38,10 +38,5 @@ public class Food : MonoBehaviour
         {
             onGround = true;
         }
-
-        if (collision.gameObject.CompareTag("Fish"))
-        {
-            collision.gameObject.GetComponent<FishController>().Health(20);
-        }
     }
 }

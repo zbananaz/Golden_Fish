@@ -51,9 +51,9 @@ public class Guppy : FishController
         base.OnTriggerEnter2D(collision);
     }
 
-    public override void Health(int amount)
+    public override int Health(int amount)
     {
-        base.Health(amount);
+        return base.Health(amount);
     }
 
     protected override void Boundary()
@@ -61,10 +61,15 @@ public class Guppy : FishController
         base.Boundary();
     }
 
-    protected override void Target()
+    protected override Transform FindTarget()
     {
-        base.Target();
+        return base.FindTarget();
     }
+
+    //protected override Transform Target()
+    //{
+    //    return base.Target();
+    //}
 
     protected override void Die()
     {
@@ -77,7 +82,11 @@ public class Guppy : FishController
         Coin = ObjectPooling.instance.GetObjectFromPool("Coin1");
         Coin.transform.position = spawnPos;
         Coin.SetActive(true);
-        
+    }
+
+    private void OnDisable()
+    {
+        level = 0;
     }
 }
 

@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private readonly Animator animator;
+    protected Animator animator;
 
-    [SerializeField] protected float moveSpeed = 81f;
+    protected float moveSpeed;
     protected float moveTime = 5f;
 
     protected int maxHealthPoint;
@@ -19,12 +20,17 @@ public class Enemy : MonoBehaviour
     protected float attackDelay;
     protected float timeToAttack;
 
-    [SerializeField] protected GameObject fish;
+    protected float percentageHP;
+
+    Collider2D[] fishColliders;
+
+    public Transform fish;
 
     protected Vector2 dir;
 
     protected virtual void Start()
     {
+        animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
         HealthPoint = maxHealthPoint;
         timeToAttack = 0;
@@ -33,17 +39,27 @@ public class Enemy : MonoBehaviour
 
     protected virtual void Update()
     {
-        Target();
+        //Target();
+        FindTarget();
         Boundary();
 
         moveTime -= Time.deltaTime;
         timeToAttack -= Time.deltaTime;
 
+        percentageHP = (float)HealthPoint / maxHealthPoint * 100;
+
+        if (HealthPoint <= 0)
+        {
+            animator.SetBool("die", true);
+            Invoke(nameof(Die), 1.5f);
+            Die();
+        }
+
         if (fish != null)
         {
-            dir = fish.transform.position - transform.position;
+            dir = fish.position - transform.position;
 
-            float distance = Vector2.Distance(transform.position, fish.transform.position);
+            float distance = Vector2.Distance(transform.position, fish.position);
 
             if (distance <= attackRanged && timeToAttack <= 0)
             {
@@ -88,58 +104,45 @@ public class Enemy : MonoBehaviour
         dir = new(dirX, dirY);
     }
 
-    protected virtual void Health(int amount)
+    public virtual int Health(int amount)
     {
         HealthPoint += amount;
 
-        if (HealthPoint <= 0)
-        {
-            animator.SetBool("die", true);
-            Invoke(nameof(Die), 1.5f);
-        }
+        HealthPoint = Mathf.Clamp(HealthPoint, 0, maxHealthPoint);
+
+        return HealthPoint;
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Fish"))
-        {
-            //collision.gameObject.GetComponent<FishController>().Health(-damage);
-        }
-
         if (collision.CompareTag("Wall"))
         {
             dir *= new Vector2(-Random.Range(1f, 1.5f), -Random.Range(-0.5f, 1.5f));
         }
     }
 
-    protected virtual void Target()
+    List<Transform> check;
+    protected virtual Transform FindTarget()
     {
-        float nearestFish = float.MaxValue;
-        List<GameObject> Fish = new();
-        Collider2D[] collider2Ds = Physics2D.OverlapCircleAll(transform.position, 15f, LayerMask.GetMask("Fish"));
-        if (collider2Ds.Length == 0)
+        fishColliders = Physics2D.OverlapCircleAll(transform.position, 14f, LayerMask.GetMask("Fish"));
+
+        check = fishColliders.Select(x => x.transform).ToList();
+
+        if (check.Count == 0) return fish = null;
+
+        else
         {
-            fish = null;
-            return;
+            fish = check.First();
+            check.ForEach(x =>
+            {
+                if ((transform.position - x.transform.position).sqrMagnitude < (transform.position - fish.transform.position).sqrMagnitude)
+                {
+                    fish = x;
+                }
+            });
+            return fish;
         }
 
-        foreach (Collider2D c in collider2Ds)
-        {
-            if (c.gameObject.CompareTag("Fish"))
-            {
-                Fish.Add(c.gameObject);
-            }
-        }
-
-        foreach (GameObject f in Fish)
-        {
-            float distance = Vector2.Distance(transform.position, f.transform.position);
-            if (distance < nearestFish)
-            {
-                nearestFish = distance;
-                fish = f;
-            }
-        }
     }
 
     protected virtual void Attack()

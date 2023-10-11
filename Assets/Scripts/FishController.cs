@@ -9,14 +9,14 @@ public class FishController : MonoBehaviour
     private Animator animator;
 
     protected int maxHealthPoint;
-    protected int HealthPoint;
-    protected int percentageHP;
+    public int HealthPoint;
+    public float percentageHP;
     protected int damage;
     protected int level;
 
     protected float y = -10;
-    protected float nearestFood;
-    protected float nearestEnemy = -1;
+
+    Collider2D[] foodColliders;
 
     [SerializeField] protected float moveSpeed = 80f;
     [SerializeField] protected Vector2 dir;
@@ -25,8 +25,7 @@ public class FishController : MonoBehaviour
     [SerializeField] protected float fallSpeed = 2f;
     [SerializeField] protected bool isFalling = true;
 
-    [SerializeField] protected GameObject enemy;
-    protected GameObject eatable;
+    public Transform eatable;
 
     protected bool die = false;
 
@@ -55,38 +54,27 @@ public class FishController : MonoBehaviour
 
     protected virtual void Update()
     {
-        
-        FindTarget(); // tim do an va enemy
+        //Target();
+        FindTarget();
 
         moveTime -= Time.deltaTime; // thoi gian doi huong di
 
-        percentageHP = (HealthPoint / maxHealthPoint) * 100;
+        percentageHP = (float)HealthPoint / maxHealthPoint * 100;
 
         animator.SetFloat("hp", percentageHP);
         animator.SetFloat("level", level);
-        if (enemy != null && nearestEnemy <= 2f)
+        if (HealthPoint <= 0)
         {
-            dir =(transform.position - enemy.transform.position).normalized;
+            animator.SetBool("die", true);
+            Invoke(nameof(Die), 1.5f);
         }
 
         if (percentageHP < 100 && eatable != null)
         {
-            dir = (eatable.transform.position - transform.position).normalized;
+            dir = (eatable.position - transform.position).normalized;
         }
-        //if (enemy != null || eatable != null)
-        //{
-        //    if (enemy != null && nearestEnemy < 2f)
-        //    {
-        //        dir = (transform.position - enemy.transform.position) * 1.5f;
-        //        Debug.Log("run");
-        //    } else
-        //    if (percentageHP < 100 && nearestFood < 3f)
-        //    {
-        //        dir = eatable.transform.position - transform.position;
-        //        Debug.Log("eat");
-        //    }
-        //} else
-        if (enemy == null && eatable == null)
+      
+        if (eatable == null)
         {
             if (moveTime <= 0)
             {
@@ -136,110 +124,42 @@ public class FishController : MonoBehaviour
             {
                 collision.gameObject.SetActive(false);
                 animator.SetTrigger("eat");
+                Health(20);
             }
-        }
-
-        if (collision.CompareTag("Enemy"))
-        {
-            Vector2 run = (transform.position - collision.gameObject.transform.position).normalized * 3f;
-            rb.AddForce(run);
-            //TODO đang ko run 
         }
     }
 
-    public virtual void Health(int amount)
+    public virtual int Health(int amount)
     {
         HealthPoint += amount;
 
-        if (HealthPoint <= 0)
-        {
-            animator.SetBool("die", true);
-            Invoke(nameof(Die), 1.5f);
-        }
+        HealthPoint = Mathf.Clamp(HealthPoint, 0, maxHealthPoint);
+
+        return HealthPoint;
     }
 
-     List<Transform> check;
-    Transform nearest;
-    public Transform FindTarget()
+    List<Transform> check;
+    protected virtual Transform FindTarget()
     {
-        Collider2D[] enemyColliders = Physics2D.OverlapCircleAll(transform.position, 13f, LayerMask.GetMask("Enemy"));
+        foodColliders = Physics2D.OverlapCircleAll(transform.position, 4f, LayerMask.GetMask("Food"));
 
-        check = enemyColliders.Select(x => x.transform).ToList();
-        nearest = check.First();
-        check.ForEach(x =>
+        check = foodColliders.Select(x => x.transform).ToList();
+
+        if (check.Count == 0) return eatable = null;
+
+        else
         {
-            if ((transform.position - x.transform.position).sqrMagnitude < (transform.position - nearest.transform.position).sqrMagnitude)
+            eatable = check.First();
+            check.ForEach(x =>
             {
-                nearest = x;
-                enemy = x.gameObject;
-                
-            }
-        });
-        return nearest;
-    }
-    Collider2D[] enemyColliders;
-        protected virtual void Target()
-    {
-        //float nearestFood = float.MaxValue;
-        //float nearestEnemy = float.MaxValue;
-        List<GameObject> Food = new();
-        List<GameObject> Enemies = new();
-        Collider2D[] foodColliders = Physics2D.OverlapCircleAll(transform.position, 3f, LayerMask.GetMask("Food"));
-        Collider2D[] enemyColliders = Physics2D.OverlapCircleAll(transform.position, 13f, LayerMask.GetMask("Enemy"));
-        check = enemyColliders.Select(x => x.transform).ToList();
-
-        //=========================================
-        // Food
-        if (foodColliders.Length == 0)
-        {
-            eatable = null;
-            return;
+                if ((transform.position - x.transform.position).sqrMagnitude < (transform.position - eatable.transform.position).sqrMagnitude)
+                {
+                    eatable = x;
+                }
+            });
+            return eatable;
         }
-
-        foreach (Collider2D c in foodColliders)
-        {
-            if (c.gameObject.CompareTag("Food"))
-            {
-                Food.Add(c.gameObject);
-            }
-        }
-
-        foreach (GameObject t in Food)
-        {
-            float distance = Vector2.Distance(transform.position, t.transform.position);
-            if (distance < nearestFood)
-            {
-                nearestFood = distance;
-                eatable = t;
-            }
-        }
-
-        //=========================================
-        // Enemy
-        if (enemyColliders.Length == 0)
-        {
-            enemy = null;
-            return;
-        }
-
-        foreach (Collider2D e in enemyColliders) //enemies
-        {
-            if (e.gameObject.CompareTag("Enemy"))
-            {
-                Enemies.Add(e.gameObject);
-            }
-        }
-
-        foreach (GameObject e in Enemies)
-        {
-            float distance = Mathf.Abs(Vector2.Distance(transform.position, e.transform.position));
-            if (distance < nearestEnemy)
-            {
-                nearestEnemy = distance;
-                enemy = e;
-                Debug.Log("Distance: " + distance);
-            }
-        }
+        
     }
 
     protected virtual void Boundary()
@@ -254,4 +174,6 @@ public class FishController : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
+
+    
 }
