@@ -54,8 +54,6 @@ public class BlueDeath : Enemy
     {
         animator.SetTrigger("attack");
         StartCoroutine(WaitForAnimation());
-        
-        
     }
 
     private IEnumerator WaitForAnimation()

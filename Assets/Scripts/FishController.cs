@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class FishController : MonoBehaviour
+public class FishController : MonoBehaviour, IDataPersistence
 {
     private Rigidbody2D rb;
     private Animator animator;
 
+    private static int nextFishID = 1;
+    public int fishID;
+
     protected int maxHealthPoint;
     public int HealthPoint;
     public float percentageHP;
-    protected int damage;
-    protected int level;
+    public int damage;
+    public int level;
 
     protected float y = -10;
 
@@ -39,6 +42,21 @@ public class FishController : MonoBehaviour
         MoveDirection();
 
         HealthPoint = maxHealthPoint;
+    }
+
+    private void OnEnable()
+    {
+        fishID = nextFishID;
+        nextFishID++;
+    }
+
+    public void LoadData(GameData data)
+    {
+    }
+
+    public void SaveData(ref GameData data)
+    {
+        
     }
 
     protected virtual void MoveDirection()

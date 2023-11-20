@@ -5,7 +5,7 @@ using UnityEngine;
 public class Guppy : FishController
 {
     private float timeToLevelUp = 30f;
-    private float timeToSpawnCoin = 9f;
+    public float timeToSpawnCoin = 15f;
 
     private GameObject Coin;
 
@@ -26,7 +26,7 @@ public class Guppy : FishController
         base.Update();
         timeToLevelUp -= Time.deltaTime;
         timeToSpawnCoin -= Time.deltaTime;
-        if (timeToLevelUp <= 0)
+        if (timeToLevelUp <= 0 && level < 4)
         {
             level += 1;
             timeToLevelUp = 30f;
@@ -65,11 +65,6 @@ public class Guppy : FishController
     {
         return base.FindTarget();
     }
-
-    //protected override Transform Target()
-    //{
-    //    return base.Target();
-    //}
 
     protected override void Die()
     {

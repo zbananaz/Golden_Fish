@@ -8,6 +8,8 @@ public class Coin : MonoBehaviour
 
     protected float timeToDisable;
 
+    public int coinValue = 10;
+
     protected virtual void Awake()
     {
         timeToDisable = timer1;
@@ -21,17 +23,12 @@ public class Coin : MonoBehaviour
             gameObject.SetActive(false);
             timeToDisable = timer1;
         }
+    }
 
-        //if (Input.GetMouseButtonDown(0))
-        //{
-        //    Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //    RaycastHit2D hit2D = Physics2D.Raycast(worldPoint, Vector2.zero);
-
-        //    if (hit2D.collider.CompareTag("Coin"))
-        //    {
-        //        // Xử lý hành động khi click vào coin ở đây
-        //        hit2D.collider.gameObject.SetActive(false);
-        //    }
-        //}
+    public void CollectCoin()
+    {
+        GameManager.Instance.bank += coinValue;
+        GameManager.Instance.BankIncrease();
+        gameObject.SetActive(false);
     }
 }

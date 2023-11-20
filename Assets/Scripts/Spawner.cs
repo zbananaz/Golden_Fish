@@ -21,8 +21,11 @@ public class Spawner : MonoBehaviour
             {
                 if (hit2D.collider.gameObject.CompareTag("Coin"))
                 {
-                    hit2D.collider.gameObject.SetActive(false);
-
+                    Coin coin = hit2D.collider.gameObject.GetComponent<Coin>();
+                    if (coin != null)
+                    {
+                        coin.CollectCoin();
+                    }
                 }
                 else
                 {
@@ -49,6 +52,8 @@ public class Spawner : MonoBehaviour
         Guppy = ObjectPooling.instance.GetObjectFromPool("Guppy");
         Guppy.transform.position = spawnPosition;
         Guppy.SetActive(true);
+        GameManager.Instance.fishes.Add(Guppy.GetComponent<FishController>();
+        //GameManager.Instance.gameData.fishesRegister();
     }
 
     private void SpawnFood()
@@ -60,3 +65,5 @@ public class Spawner : MonoBehaviour
 
     }
 }
+
+//Remove ca'
