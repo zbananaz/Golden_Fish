@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.Rendering.DebugUI;
 
-public class GameManager : MonoBehaviour, IDataPersistence 
+public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
@@ -17,26 +17,12 @@ public class GameManager : MonoBehaviour, IDataPersistence
     public List<FishController> fishes;
 
     [SerializeField] private TextMeshProUGUI bankText;
-    public GameData gameData;
     private void Awake()
     {
         if (Instance == null)
             Instance = this;
         leftEdge = Camera.main.ScreenToWorldPoint(Vector2.zero);
         rightEdge = Camera.main.ScreenToWorldPoint(new Vector2 (Screen.width, Screen.height));
-        bank = FishDataManager.Instance.GetBank();
-        gameData = new GameData();
-        gameData.Load();
-    }
-
-    public void LoadData(GameData data)
-    {
-        this.bank = data.bank;
-    }
-
-    public void SaveData (ref GameData data)
-    {
-        data.bank = this.bank;
     }
 
     private void Start()
@@ -52,6 +38,6 @@ public class GameManager : MonoBehaviour, IDataPersistence
 
     private void OnApplicationQuit()
     {
-        gameData.Save();
+        //gameData.Save();
     }
 }

@@ -8,7 +8,8 @@ public class Enemy : MonoBehaviour
     private Rigidbody2D rb;
     protected Animator animator;
 
-    protected float moveSpeed;
+    public float moveSpeed;
+    public float originalSpeed;
     protected float moveTime = 5f;
 
     protected int maxHealthPoint;
@@ -20,6 +21,10 @@ public class Enemy : MonoBehaviour
     protected float attackDelay;
     protected float timeToAttack;
 
+    protected float lastSlowTime;
+    protected float slowFactor = 0.8f;
+    protected float slowDuration = 2f;
+
     protected float percentageHP;
 
     Collider2D[] fishColliders;
@@ -27,6 +32,7 @@ public class Enemy : MonoBehaviour
     public Transform fish;
 
     protected Vector2 dir;
+    public bool isSlowDown;
 
     protected virtual void Start()
     {
@@ -34,7 +40,9 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         HealthPoint = maxHealthPoint;
         timeToAttack = 0;
+        isSlowDown = false;
         MoveDirection();
+        originalSpeed = moveSpeed;
     }
 
     protected virtual void Update()
@@ -73,10 +81,19 @@ public class Enemy : MonoBehaviour
             {
                 MoveDirection();
                 moveTime = Random.Range(3f, 5f);
+                Debug.Log("Move enemy");
             }
         }
 
-        
+        if (isSlowDown)
+        {
+            if (Time.time - lastSlowTime > slowDuration)
+            {
+                // Reset tốc độ gốc và tắt trạng thái làm chậm
+                moveSpeed = originalSpeed;
+                isSlowDown = false;
+            }
+        }
     }
 
     protected virtual void FixedUpdate()
@@ -142,12 +159,10 @@ public class Enemy : MonoBehaviour
             });
             return fish;
         }
-
     }
 
     protected virtual void Attack()
     {
-        Debug.Log("Attack");
         fish.GetComponent<FishController>().Health(-damage);
     }
 
@@ -159,11 +174,22 @@ public class Enemy : MonoBehaviour
         transform.position = enemyPos;
     }
 
+    public void SlowDownEffect()
+    {
+        if (!isSlowDown)
+        {
+            // Áp dụng hiệu ứng làm chậm
+            moveSpeed *= slowFactor;
+            isSlowDown = true;
+        }
+        // Ghi lại thời điểm áp dụng làm chậm
+        lastSlowTime = Time.time;
+    }
+
+
     protected virtual void Die()
     {
         gameObject.SetActive(false);
-
         // die
-
     }
 }

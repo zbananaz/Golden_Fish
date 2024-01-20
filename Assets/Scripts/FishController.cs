@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class FishController : MonoBehaviour, IDataPersistence
+public class FishController : MonoBehaviour
 {
     private Rigidbody2D rb;
     private Animator animator;
@@ -20,15 +20,18 @@ public class FishController : MonoBehaviour, IDataPersistence
     protected float y = -10;
 
     Collider2D[] foodColliders;
+    Collider2D[] enemyColliders;
 
     [SerializeField] protected float moveSpeed = 80f;
-    [SerializeField] protected Vector2 dir;
-    [SerializeField] protected float moveTime = 5f;
+    protected Vector2 dir;
+    protected Vector2 dirToEnemy;
+    protected float moveTime = 5f;
 
-    [SerializeField] protected float fallSpeed = 2f;
-    [SerializeField] protected bool isFalling = true;
+    protected float fallSpeed = 2f;
+    protected bool isFalling = true;
 
     public Transform eatable;
+    public Transform enemy;
 
     protected bool die = false;
 
@@ -50,15 +53,6 @@ public class FishController : MonoBehaviour, IDataPersistence
         nextFishID++;
     }
 
-    public void LoadData(GameData data)
-    {
-    }
-
-    public void SaveData(ref GameData data)
-    {
-        
-    }
-
     protected virtual void MoveDirection()
     {
         float randomAngle = Random.Range(0, 360f);
@@ -73,7 +67,8 @@ public class FishController : MonoBehaviour, IDataPersistence
     protected virtual void Update()
     {
         //Target();
-        FindTarget();
+        FindFood();
+        FindEnemy();
 
         moveTime -= Time.deltaTime; // thoi gian doi huong di
 
@@ -156,19 +151,19 @@ public class FishController : MonoBehaviour, IDataPersistence
         return HealthPoint;
     }
 
-    List<Transform> check;
-    protected virtual Transform FindTarget()
+    List<Transform> checkFood;
+    protected virtual Transform FindFood()
     {
         foodColliders = Physics2D.OverlapCircleAll(transform.position, 4f, LayerMask.GetMask("Food"));
 
-        check = foodColliders.Select(x => x.transform).ToList();
+        checkFood = foodColliders.Select(x => x.transform).ToList();
 
-        if (check.Count == 0) return eatable = null;
+        if (checkFood.Count == 0) return eatable = null;
 
         else
         {
-            eatable = check.First();
-            check.ForEach(x =>
+            eatable = checkFood.First();
+            checkFood.ForEach(x =>
             {
                 if ((transform.position - x.transform.position).sqrMagnitude < (transform.position - eatable.transform.position).sqrMagnitude)
                 {
@@ -177,7 +172,29 @@ public class FishController : MonoBehaviour, IDataPersistence
             });
             return eatable;
         }
-        
+    }
+
+    List<Transform> checkEnemy;
+    protected virtual Transform FindEnemy()
+    {
+        enemyColliders = Physics2D.OverlapCircleAll(transform.position, 10f, LayerMask.GetMask("Enemy"));
+
+        checkEnemy = enemyColliders.Select(x => x.transform).ToList();
+
+        if (checkEnemy.Count == 0) return enemy = null;
+
+        else
+        {
+            enemy = checkEnemy.First();
+            checkEnemy.ForEach(x =>
+            {
+                if ((transform.position - x.transform.position).sqrMagnitude < (transform.position - enemy.transform.position).sqrMagnitude)
+                {
+                    enemy = x;
+                }
+            });
+            return enemy;
+        }
     }
 
     protected virtual void Boundary()

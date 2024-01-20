@@ -4,15 +4,18 @@ using UnityEngine;
 
 public class BlueDeath : Enemy
 {
+    void Awake()
+    {
+        moveSpeed = 60f;
+    }
+
     protected override void Start()
     {
         base.Start();
         damage = 0;
         attackRanged = 1.5f;
         attackDelay = 5f;
-        moveSpeed = 60f;
-
-        maxHealthPoint = 100;
+        maxHealthPoint = 200;
         HealthPoint = maxHealthPoint;
     }
 

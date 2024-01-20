@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class KingGuppy : FishController
 {
-    public float timeToSpawnCoin = 9f;
-
-    private GameObject Coin;
+    [SerializeField] GameObject weaponHolder;
+    private GameObject iceShard;
+    private float skillDelay = .1f;
 
     protected override void Start()
     {
         level = 0;
-        maxHealthPoint = 100;
+        maxHealthPoint = 150;
         base.Start();
     }
 
@@ -22,14 +22,39 @@ public class KingGuppy : FishController
 
     protected override void Update()
     {
-        base.Update();
-        timeToSpawnCoin -= Time.deltaTime;
-        if (timeToSpawnCoin <= 0)
+        skillDelay -= Time.deltaTime;
+        moveTime -= Time.deltaTime;
+
+        if (enemy != null)
         {
-            SpawnCoin();
-            timeToSpawnCoin = 9f;
+            if (skillDelay <= 0)
+            {
+                Attack();
+                skillDelay = 1.5f;
+            }
         }
 
+        if (moveTime <= 0)
+        {
+            MoveDirection();
+            moveTime = Random.Range(3f, 5f);
+        }
+
+    }
+
+    private void Attack()
+    {
+        dirToEnemy = (enemy.position - transform.position).normalized;
+        iceShard = ObjectPooling.instance.GetObjectFromPool("Ice Shard");
+
+        iceShard.transform.position = weaponHolder.transform.position;
+        iceShard.SetActive(true);
+
+        //set target
+        iceShard.GetComponent<IceShard>().SetTarget(dirToEnemy);
+
+        //xoay vien dan
+        iceShard.transform.Rotate(0, 0, (Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg));
     }
 
     protected override void FixedUpdate()
@@ -37,6 +62,15 @@ public class KingGuppy : FishController
         base.FixedUpdate();
     }
 
+    protected override Transform FindEnemy()
+    {
+        return base.FindEnemy();
+    }
+
+    protected override Transform FindFood()
+    {
+        return base.FindFood();
+    }
 
     protected override void OnTriggerEnter2D(Collider2D collision)
     {
@@ -53,22 +87,8 @@ public class KingGuppy : FishController
         base.Boundary();
     }
 
-    protected override Transform FindTarget()
-    {
-        return base.FindTarget();
-    }
-
     protected override void Die()
     {
         base.Die();
     }
-
-    private void SpawnCoin()
-    {
-        Vector2 spawnPos = transform.position;
-        Coin = ObjectPooling.instance.GetObjectFromPool("Coin1");
-        Coin.transform.position = spawnPos;
-        Coin.SetActive(true);
-    }
-
 }

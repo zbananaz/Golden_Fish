@@ -4,14 +4,30 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    GameObject Guppy;
+    private GameObject Guppy;
     private GameObject Food1;
+    private GameObject BlueDeath;
     private Vector2 mousePos;
+    private float timerBlueDeath = 300f;
+    private float timerSpawnBlueDeath;
 
+    private void Start()
+    {
+        timerSpawnBlueDeath = timerBlueDeath;
+    }
     void Update()
     {
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D hit2D = Physics2D.Raycast(worldPoint, Vector2.zero);
+
+        timerSpawnBlueDeath -= Time.deltaTime;
+
+        if (timerSpawnBlueDeath <= 0)
+        {
+            SpawnBlueDeath();
+            timerSpawnBlueDeath = timerBlueDeath;
+
+        }
 
         mousePos = Input.mousePosition;
 
@@ -52,7 +68,7 @@ public class Spawner : MonoBehaviour
         Guppy = ObjectPooling.instance.GetObjectFromPool("Guppy");
         Guppy.transform.position = spawnPosition;
         Guppy.SetActive(true);
-        GameManager.Instance.fishes.Add(Guppy.GetComponent<FishController>();
+        GameManager.Instance.fishes.Add(Guppy.GetComponent<FishController>());
         //GameManager.Instance.gameData.fishesRegister();
     }
 
@@ -63,6 +79,15 @@ public class Spawner : MonoBehaviour
         Food1.transform.position = spawnPosition;
         Food1.SetActive(true);
 
+    }
+
+    private void SpawnBlueDeath()
+    {
+        float spawnPosX = Random.Range(-8, 8);
+        Vector2 spawnPosition = new(spawnPosX, 6);
+        BlueDeath = ObjectPooling.instance.GetObjectFromPool("BlueDeath");
+        BlueDeath.transform.position = spawnPosition;
+        BlueDeath.SetActive(true);
     }
 }
 

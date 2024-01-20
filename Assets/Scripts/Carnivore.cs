@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class Carnivore : FishController
 {
-    public float timeToSpawnCoin = 9f;
-
-    private GameObject Coin;
+    [SerializeField] GameObject weaponHolder;
+    private GameObject megaShot;
+    private float skillDelay = 1f;
 
     protected override void Start()
     {
         level = 0;
-        maxHealthPoint = 100;
+        maxHealthPoint = 200;
         base.Start();
     }
 
@@ -22,13 +22,33 @@ public class Carnivore : FishController
 
     protected override void Update()
     {
-        base.Update();
-        timeToSpawnCoin -= Time.deltaTime;
-        if (timeToSpawnCoin <= 0)
+        skillDelay -= Time.deltaTime;
+        moveTime -= Time.deltaTime;
+
+        FindFood();
+        FindEnemy();
+        if (enemy != null)
         {
-            SpawnCoin();
-            timeToSpawnCoin = 9f;
+            if (skillDelay <= 0)
+            {
+                Attack();
+                skillDelay = 2f;
+            }
         }
+
+        if (moveTime <= 0)
+        {
+            MoveDirection();
+            moveTime = Random.Range(3f, 5f);
+        }
+    }
+
+    private void Attack()
+    {
+        megaShot = ObjectPooling.instance.GetObjectFromPool("MegaShot");
+
+        megaShot.transform.position = weaponHolder.transform.position;
+        megaShot.SetActive(true);
 
     }
 
@@ -53,22 +73,18 @@ public class Carnivore : FishController
         base.Boundary();
     }
 
-    protected override Transform FindTarget()
+    protected override Transform FindFood()
     {
-        return base.FindTarget();
+        return base.FindFood();
+    }
+
+    protected override Transform FindEnemy()
+    {
+        return base.FindEnemy();
     }
 
     protected override void Die()
     {
         base.Die();
     }
-
-    private void SpawnCoin()
-    {
-        Vector2 spawnPos = transform.position;
-        Coin = ObjectPooling.instance.GetObjectFromPool("Coin1");
-        Coin.transform.position = spawnPos;
-        Coin.SetActive(true);
-    }
-
 }

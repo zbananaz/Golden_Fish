@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7339725484925826900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4720591561709749063}
+  m_Layer: 0
+  m_Name: Weapon Holder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4720591561709749063
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7339725484925826900}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.059, y: -0.075, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8692839765840075553}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8692839765840075554
 GameObject:
   m_ObjectHideFlags: 0
@@ -32,6 +63,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8692839766415683537}
+  - {fileID: 4720591561709749063}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -110,15 +142,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e87875cf3b77f47f1b61e1f74793c3e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fishID: 0
   HealthPoint: 0
   percentageHP: 0
+  damage: 0
+  level: 0
   moveSpeed: 80
   dir: {x: 0, y: 0}
   moveTime: 5
   fallSpeed: 2
   isFalling: 1
   eatable: {fileID: 0}
-  timeToSpawnCoin: 9
+  weaponHolder: {fileID: 7339725484925826900}
+  enemy: {fileID: 0}
 --- !u!1 &8692839766415683538
 GameObject:
   m_ObjectHideFlags: 0

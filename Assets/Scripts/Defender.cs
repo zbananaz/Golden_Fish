@@ -2,13 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
-public class GateKeeper : MonoBehaviour
+public class Defender : MonoBehaviour
 {
     private Rigidbody2D rb;
     private Animator animator;
-    private readonly int damage = 10;
+    private readonly int damage;
     private readonly float moveSpeed = 80f;
     private float moveTime = 5f;
     private Collider2D[] enemyColliders;
@@ -32,13 +31,13 @@ public class GateKeeper : MonoBehaviour
         moveTime -= Time.deltaTime;
 
         FindTarget();
-        if (enemy !=  null)
+        if (enemy != null)
         {
             if (skillDelay <= 0)
             {
                 Attack();
                 skillDelay = 1f;
-                dir = new((enemy.position - transform.position).x,0);
+                dir = new((enemy.position - transform.position).x, 0);
             }
         }
         else
@@ -49,7 +48,7 @@ public class GateKeeper : MonoBehaviour
                 moveTime = Random.Range(3f, 5f);
             }
         }
-        
+
     }
 
     private void FixedUpdate()
@@ -67,9 +66,9 @@ public class GateKeeper : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.CompareTag("Wall"))
+        if (collision.CompareTag("Wall"))
         {
-            dir *= new Vector2(-1,0);
+            dir *= new Vector2(-1, 0);
         }
     }
 
@@ -109,11 +108,6 @@ public class GateKeeper : MonoBehaviour
     {
         animator.SetTrigger("attack");
         StartCoroutine(WaitForAnimation());
-
-        //LightingSkill = ObjectPooling.instance.GetObjectFromPool("Lighting skill");
-        //LightingSkill.transform.position = new(enemy.position.x, enemy.position.y + 3f);
-        //LightingSkill.SetActive(true);
-        //enemy.GetComponent<Enemy>().Health(-damage);
     }
 
     private IEnumerator WaitForAnimation()
@@ -126,6 +120,6 @@ public class GateKeeper : MonoBehaviour
             LightingSkill.SetActive(true);
             enemy.GetComponent<Enemy>().Health(-damage);
         }
-        
+
     }
 }

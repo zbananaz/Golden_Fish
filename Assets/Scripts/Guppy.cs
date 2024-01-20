@@ -61,9 +61,9 @@ public class Guppy : FishController
         base.Boundary();
     }
 
-    protected override Transform FindTarget()
+    protected override Transform FindFood()
     {
-        return base.FindTarget();
+        return base.FindFood();
     }
 
     protected override void Die()
