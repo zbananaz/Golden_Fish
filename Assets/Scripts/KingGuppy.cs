@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class KingGuppy : FishController
 {
-    [SerializeField] GameObject weaponHolder;
     private GameObject iceShard;
     private float skillDelay = .1f;
 
@@ -40,6 +39,7 @@ public class KingGuppy : FishController
             moveTime = Random.Range(3f, 5f);
         }
 
+        base.Update();
     }
 
     private void Attack()
@@ -47,7 +47,7 @@ public class KingGuppy : FishController
         dirToEnemy = (enemy.position - transform.position).normalized;
         iceShard = ObjectPooling.instance.GetObjectFromPool("Ice Shard");
 
-        iceShard.transform.position = weaponHolder.transform.position;
+        iceShard.transform.position = transform.position;
         iceShard.SetActive(true);
 
         //set target

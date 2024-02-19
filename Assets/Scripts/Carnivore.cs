@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class Carnivore : FishController
 {
-    [SerializeField] GameObject weaponHolder;
     private GameObject megaShot;
-    private float skillDelay = 1f;
+    private float skillDelay = .1f;
 
     protected override void Start()
     {
@@ -25,8 +24,6 @@ public class Carnivore : FishController
         skillDelay -= Time.deltaTime;
         moveTime -= Time.deltaTime;
 
-        FindFood();
-        FindEnemy();
         if (enemy != null)
         {
             if (skillDelay <= 0)
@@ -41,15 +38,22 @@ public class Carnivore : FishController
             MoveDirection();
             moveTime = Random.Range(3f, 5f);
         }
+        base.Update();
     }
 
     private void Attack()
     {
+        dirToEnemy = (enemy.position - transform.position).normalized;
         megaShot = ObjectPooling.instance.GetObjectFromPool("MegaShot");
 
-        megaShot.transform.position = weaponHolder.transform.position;
+        megaShot.transform.position = transform.position;
         megaShot.SetActive(true);
 
+        //set target
+        megaShot.GetComponent<MegaShot>().SetTarget(dirToEnemy);
+
+        //xoay vien dan
+        megaShot.transform.Rotate(0, 0, (Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg));
     }
 
     protected override void FixedUpdate()

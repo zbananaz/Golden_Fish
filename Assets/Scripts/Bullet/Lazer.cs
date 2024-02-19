@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Lazer : MonoBehaviour
 {
-    public Transform target;
     [SerializeField] private int damage = 10;
     [SerializeField] private float speed = 20;
     Rigidbody2D rb;
@@ -27,7 +26,7 @@ public class Lazer : MonoBehaviour
             gameObject.SetActive(false);
 
             gameObject.transform.rotation = Quaternion.identity;
-            target.GetComponent<Enemy>().Health(-damage);
+            collision.GetComponent<Enemy>().Health(-damage);
         }
     }
 

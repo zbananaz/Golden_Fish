@@ -4,7 +4,7 @@ using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
 public class IceShard : MonoBehaviour
-{
+{   
     [SerializeField] private int damage = 5;
     [SerializeField] private float speed = 10;
     Rigidbody2D rb;

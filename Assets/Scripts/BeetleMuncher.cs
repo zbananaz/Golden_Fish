@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class BeetleMuncher : FishController
 {
-    [SerializeField] GameObject weaponHolder;
     private GameObject lazer;
     private float skillDelay = .1f;
 
@@ -30,7 +29,7 @@ public class BeetleMuncher : FishController
             if (skillDelay <= 0)
             {
                 Attack();
-                skillDelay = 0.5f;
+                skillDelay = 0.25f;
             }
         }
 
@@ -39,6 +38,8 @@ public class BeetleMuncher : FishController
             MoveDirection();
             moveTime = Random.Range(3f, 5f);
         }
+
+        base.Update();
     }
 
     private void Attack()
@@ -46,7 +47,7 @@ public class BeetleMuncher : FishController
         dirToEnemy = (enemy.position - transform.position).normalized;
         lazer = ObjectPooling.instance.GetObjectFromPool("Lazer");
 
-        lazer.transform.position = weaponHolder.transform.position;
+        lazer.transform.position = transform.position;
         lazer.SetActive(true);
 
         //set target

@@ -4,23 +4,18 @@ using UnityEngine;
 
 public class MegaShot : MonoBehaviour
 {
-    public Transform target;
     [SerializeField] private int damage = 50;
     [SerializeField] private float speed = 10;
+    Rigidbody2D rb;
 
-
-    private void Update()
+   private void Awake()
     {
-        target = gameObject.GetComponent<FishController>().enemy;
-        if (target != null)
-        {
-            Shoot();
-        }
+        rb = gameObject.GetComponent<Rigidbody2D>();
     }
-    private void Shoot()
+
+    public void SetTarget(Vector3 dir)
     {
-        transform.position = Vector3.MoveTowards(transform.position,
-            target.position, speed * Time.deltaTime);
+        rb.velocity = dir * speed;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -30,7 +25,7 @@ public class MegaShot : MonoBehaviour
             gameObject.SetActive(false);
 
             gameObject.transform.rotation = Quaternion.identity;
-            target.GetComponent<Enemy>().Health(-damage);
+            collision.GetComponent<Enemy>().Health(-damage);
         }
     }
 
